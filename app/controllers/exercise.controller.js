@@ -31,13 +31,13 @@ exports.createExercise = async (req, res) => {
       const pathVideo = files.video.tempFilePath;
       
       let newpathImage = await uploaderImage(pathImage);
-      // if (!newpathImage){
-      //   res.status(500).json({error:'Failed to upload image'});
-      // }
+      if (!newpathImage){
+        res.status(500).json({error:'Failed to upload image'});
+      }
       let newpathVideo = await uploaderVideo(pathVideo);
-      // if (!newpathVideo){
-      //   res.status(500).json({error:'Failed to upload video'});
-      // }
+      if (!newpathVideo){
+        res.status(500).json({error:'Failed to upload video'});
+      }
       url_image= newpathImage.url;
       url_video = newpathVideo.url;
     }

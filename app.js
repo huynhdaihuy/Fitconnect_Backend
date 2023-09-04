@@ -8,7 +8,7 @@ const app = express();
 
 const productRouter = require('./app/routes/product.route');
 const authRouter = require('./app/routes/auth.routes');
-const userRouter = require('./app/routes/customer.routes');
+const userRouter = require('./app/routes/customer.route');
 const cartRouter = require('./app/routes/cart.route');
 const orderRouter = require('./app/routes/order.route');
 const uploadRouter = require('./app/routes/upload.route');
@@ -20,6 +20,8 @@ const paymentRouter = require('./app/routes/payment.route');
 const certificationRouter = require('./app/routes/certification.route');
 const exerciseRouter = require('./app/routes/exercise.route');
 const planRouter = require('./app/routes/plan.route');
+const customerRouter = require('./app/routes/customer.route');
+const messageRouter = require('./app/routes/message.route');
 
 
 
@@ -71,6 +73,8 @@ app.use('/api/payment', paymentRouter);
 app.use('/api/certification', certificationRouter);
 app.use('/api/exercise', exerciseRouter);
 app.use('/api/plan', planRouter);
+app.use('/api/customer', customerRouter);
+app.use('/api/message', messageRouter);
 
 
 

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const CoachModel = require("../models/coach.model");
 const messageSchema = new mongoose.Schema(
   {
     sender_id: {
@@ -10,16 +10,12 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    name: {
-      type: String,
-      required: true,
-    },
     receiver_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
     },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
 const Message = mongoose.model("Message", messageSchema);

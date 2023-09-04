@@ -38,7 +38,7 @@ const CustomerSchema = new mongoose.Schema(
       required: true,
       unique: [true, "User's phone number required"],
       maxLength: 10,
-      match: [/0[35789]\d{8}$/, "Format of phone is invalid!"],
+      // match: [/0[35789]\d{8}$/, "Format of phone is invalid!"],
     },
     password: {
       type: String,
@@ -51,11 +51,11 @@ const CustomerSchema = new mongoose.Schema(
     },
     height: {
       type: Number,
-      required: true,
+      // required: true,
     },
     weight: {
       type: Number,
-      required: true,
+      // required: true,
     },
     url_avatar: {
       type: String,
