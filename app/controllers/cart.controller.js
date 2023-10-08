@@ -1,86 +1,101 @@
-const db = require("../models");
-const asyncHandler = require("express-async-handler");
-const { ObjectId } = require("mongodb");
+const Cart = require("../models/cart.model");
 
-const Cart = db.cart;
-const User = db.user;
-const Product = db.product;
+exports.createCart = async (req, res) => {
+  try {
+    const { orderBy, courses, cartTotal } = req.body;
+    const existingCart = await Cart.findOne({ orderBy: orderBy });
+    if (existingCart) {
+      existingCart.courses = req.body.courses;
+      existingCart.cartTotal = req.body.cartTotal;
+      await existingCart.save();
+      res.json(existingCart);
+    } else {
+      const newCart = new Cart({
+        courses,
+        cartTotal,
+        orderBy,
+      });
 
+      const savedCart = await newCart.save();
+      res.json(savedCart);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
-
-const addCart = asyncHandler(async(req, res) => {
-    const { _id, cart } = req.body;
-    try {
-        let products = [];
-        const user = await User.findById(_id);
-
-        const alreadyExistCart = await Cart.findOne({ orderBy: user._id });
-        if (alreadyExistCart) {
-            alreadyExistCart.remove();
+exports.getCartByIdCustomer = async (req, res) => {
+  const { customerId } = req.params;
+  try {
+    const cart = await Cart.findOne({ orderBy: customerId })
+      .populate({
+        path: "courses",
+        populate: {
+          path: "coach_id",
+          model: "Coach" // Replace "Coach" with the actual model name for coaches
         }
-        for (let i = 0; i < cart.length; i++) {
-            let object = {};
-            object.product = cart[i]._id;
-            object.count = cart[i].count;
-            let product = await Product.findById(cart[i]._id);
-            product.sale.isOnSale ? object.price = product.price - (product.sale.salePercentage / 100 * product.price) : object.price = product.price
-            products.push(object);
-        }
-        let cartTotal = 0;
-
-        for (let i = 0; i < products.length; i++) {
-            cartTotal = cartTotal + products[i].price * products[i].count;
-        }
+      })
+      .populate("orderBy");
+    res.json(cart);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
-        let newCart = await new Cart({
-            products,
-            cartTotal,
-            orderBy: user._id,
-        }).save();
-        res.json(newCart);
-    } catch (error) {
-        throw new Error(error);
+exports.getCartById = async (req, res) => {
+  const { cartId } = req.params;
+  try {
+    const cart = await Cart.findById(cartId)
+      .populate("courses")
+      .populate("orderBy");
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
     }
-});
 
-const getUserCart = asyncHandler(async(req, res) => {
-    const id = req.params.id;
-    if (!ObjectId.isValid(id)) throw new Error("Invalid id!");
-    try {
-        const cart = await Cart.findOne({ orderBy: id }).populate("products.product").populate("isUsedCoupon.couponTnfo");
-        res.json(cart);
-    } catch (error) {
-        throw new Error(error);
-    }
-});
+    res.json(cart);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
-const emptyCart = asyncHandler(async(req, res) => {
-    const id = req.params.id;
-    if (!ObjectId.isValid(id)) throw new Error("Invalid id!");
-    try {
-        const user = await User.findOne({ _id });
-        const cart = await Cart.findOneAndRemove({ orderBy: user._id });
-        res.json(cart);
-    } catch (error) {
-        throw new Error(error);
-    }
-});
+exports.updateCartById = async (req, res) => {
+  const { cartId } = req.params;
+  const updateData = req.body;
 
-const updateCart = asyncHandler(async(req, res) => {
-    const id = req.params;
-    try {
-        const updateCart = await Cart.findOneAndUpdate({ id }, req.body, {
-            new: true,
-        });
-        res.json(updateCart);
-    } catch (error) {
-        throw new Error(error);
+  try {
+    const cart = await Cart.findByIdAndUpdate(cartId, updateData, {
+      new: true,
+    });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
     }
-});
-module.exports = {
-    addCart,
-    getUserCart,
-    emptyCart,
-    updateCart
-}
+
+    res.json(cart);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.deleteCart = async (req, res) => {
+  const { cartId } = req.params;
+
+  try {
+    const cart = await Cart.findByIdAndDelete(cartId);
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    res.json({ message: "Cart deleted" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

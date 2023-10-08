@@ -7,5 +7,7 @@ router.post('/', categoryController.createCategory);
 
 // Route to get all categories
 router.get('/', categoryController.getAllCategories);
+router.put('/upload-image/:id', categoryController.uploadImageCategory);
+
 
 module.exports = router;

@@ -92,7 +92,7 @@ exports.getAllMessagesBetweenUsers = async function (req, res) {
           receiver_id: ObjectId(senderId),
         },
       ],
-    }).sort({ createdAt: 1 }); // Sort by createdAt in ascending order (oldest to newest)
+    }).sort({ createdAt: 1 }); 
 
     res.json(messages);
   } catch (error) {

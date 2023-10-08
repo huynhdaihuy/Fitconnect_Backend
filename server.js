@@ -12,9 +12,9 @@ db.mongoose
     .then(() => {
         console.log("Successfully connect to Mongoose.");
         const PORT = config.app.port;
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
-        })
+        // app.listen(PORT, () => {
+        //     console.log(`Server is running on port ${PORT}`);
+        // })
     })
     .catch(err => {
         console.error("Connection error", err);

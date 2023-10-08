@@ -1,36 +1,41 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const exerciseSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: true,
+  },
+  coach_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Coach",
+    required: true,
   },
   description: {
     type: String,
-    required: true
+    required: true,
   },
   url_image: {
     type: String,
-    required: false
+    required: false,
   },
   url_video: {
     type: String,
-    required: false
+    required: false,
   },
   duration: {
     type: Number,
-    required: true
+    required: true,
   },
   quantity_rep_per_set: {
     type: Number,
-    required: true
+    required: true,
   },
   quantity_set: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 });
 
-const Exercise = mongoose.model('Exercise', exerciseSchema);
+const Exercise = mongoose.model("Exercise", exerciseSchema);
 
 module.exports = Exercise;

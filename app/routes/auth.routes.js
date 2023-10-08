@@ -7,8 +7,8 @@ const { validateToken, verifyToken } = require('../middleware/authJwt')
 router.route(
     "/signup"
 ).post([
-    verifySignUp.checkDuplicateUsernameOrEmail,
-    verifySignUp.checkRolesExisted,
+    // verifySignUp.checkDuplicateUsernameOrEmail,
+    // verifySignUp.checkRolesExisted,
     authController.signup
 ]);
 
@@ -22,12 +22,12 @@ router.route("/signin").post((req, res, next) => {
 
 router.route("/check-token").get([verifyToken, validateToken]);
 
-router.route("/signin-admin/").post((req, res, next) => {
+router.route("/signin-coach/").post((req, res, next) => {
     res.set(
         "Access-Control-Allow-Headers",
         " Origin, Content-Type, Accept"
     );
     next();
-}, authController.signinAdmin);
+}, authController.signinCoach);
 
 module.exports = router;

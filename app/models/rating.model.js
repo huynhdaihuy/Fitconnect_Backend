@@ -22,9 +22,10 @@ const ratingSchema = new mongoose.Schema({
 });
 
 ratingSchema.statics.getAverageRating = async function (courseId) {
+  
     const result = await this.aggregate([
       {
-        $match: { course_id: courseId }
+        $match: { course_id: mongoose.Types.ObjectId(courseId) }
       },
       {
         $group: {
@@ -33,7 +34,6 @@ ratingSchema.statics.getAverageRating = async function (courseId) {
         }
       }
     ]);
-  
     if (result.length > 0) {
       return result[0].averageRating;
     } else {

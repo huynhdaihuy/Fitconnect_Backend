@@ -13,6 +13,7 @@ router.post("/", controller.createCustomer);
 //     .post(controller.forgotPassword)
 
 // router.put('/:id/password', controller.changePassword);
+router.put('/upload-image/:id', controller.uploadAvatar);
 
 router
   .route("/:id")

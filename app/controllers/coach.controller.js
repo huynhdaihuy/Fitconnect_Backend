@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const Coach = require("../models/coach.model");
 const {
   cloudinaryUploadImg,
-  cloudinaryDeleteImg,
 } = require("../utils/cloudinary");
 
 exports.createCoach = async (req, res) => {

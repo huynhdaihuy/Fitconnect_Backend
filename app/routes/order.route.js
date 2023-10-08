@@ -1,29 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const {
-    getAllOrders,
-    createOrder,
-    getOdrerByID,
-    updateOrderStatus,
-    getUserAllOdrer,
-    getBestSellingProduct
+  createOrder,
+  getOrderById,
+  getOrdersByCustomerId,
+  updateOrderById,
+  deleteOrderById,
 } = require("../controllers/order.controller");
 
-router.get("/", getAllOrders);
+// router.get("/", getAllOrders);
 
-router.get("/best-selling-product", getBestSellingProduct);
+// router.get("/best-selling-product", getBestSellingProduct);
 
 router.post("/", createOrder);
 
-// Get by id of user
-router.get("/user/:id", getUserAllOdrer);
+// Get by id of customer
+router.get("/customer/:customerId", getOrdersByCustomerId);
 
 // Get by id of order
-router.get("/:id", getOdrerByID);
+router.get("/:id", getOrderById);
 
 // Update by id of order
 
-router.put("/:id", updateOrderStatus);
+router.put("/:id", updateOrderById);
 
+router.delete("/:id", deleteOrderById);
 
 module.exports = router;
