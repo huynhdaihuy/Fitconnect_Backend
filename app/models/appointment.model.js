@@ -4,7 +4,7 @@ const appointmentSchema = new mongoose.Schema(
   {
     fromCustomer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Customer", // Assuming you have a 'Customer' model
+      ref: "Customer", 
       required: true,
     },
     toCoach: {
@@ -24,7 +24,7 @@ const appointmentSchema = new mongoose.Schema(
       },
     },
     time: {
-      type: Date,
+      type: String,
       required: true,
     },
     status: {

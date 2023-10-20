@@ -10,10 +10,6 @@ const gallerySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Course'
   }],
-  list_rent_service: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'RentService'
-  }]
 });
 
 const Gallery = mongoose.model('Gallery', gallerySchema);

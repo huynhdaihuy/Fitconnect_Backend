@@ -6,6 +6,7 @@ const {
   getOrdersByCustomerId,
   updateOrderById,
   deleteOrderById,
+  deleteAllOrder,
 } = require("../controllers/order.controller");
 
 // router.get("/", getAllOrders);
@@ -20,6 +21,7 @@ router.get("/customer/:customerId", getOrdersByCustomerId);
 // Get by id of order
 router.get("/:id", getOrderById);
 
+router.delete("/", deleteAllOrder);
 // Update by id of order
 
 router.put("/:id", updateOrderById);

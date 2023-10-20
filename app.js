@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 var bodyParser = require("body-parser");
-const http = require("http"); // Import the http module
+const http = require("http"); 
 const socketIo = require("socket.io"); //
 require("dotenv").config();
 const mongoose = require("mongoose");
@@ -13,7 +13,7 @@ const config = require("./app/config");
 const db = require("./app/models");
 const Role = db.role;
 
- db.mongoose
+db.mongoose
   .connect(
     `mongodb+srv://huynhdaihuybank3:UmDSkY4KujpcsERs@cluster0.vdbdbvn.mongodb.net/fitconnect`,
     {
@@ -40,35 +40,27 @@ server.listen(8080, () => {
 const io = socketIo(server);
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.username;
-  console.log("🚀 ~ file: app.js:22 ~ io.on ~ userId:", userId);
+  console.log("A user connected: "+ userId);
+  socket.on("message", (message) => {
+    const { sender_id, receiver_id, content } = message;
 
-  console.log("A user connected");
-  socket.on("message", (data) => {
-    const message = {
-      content: data.content,
-      sender_id: data.sender_id,
-      receiver_id: data.coach_id,
-      createdAt: new Date().toISOString(),
-    };
-    console.log("🚀 ~ file: app.js:32 ~ socket.on ~ message:", message);
-    io.emit("messageResponse", message);
+    const newMessage = new Message({
+      sender_id: sender_id,
+      receiver_id: receiver_id,
+      content: content,
+    });
+    // console.log("newMessage is : " + newMessage);
+    newMessage.save((err) => {
+      if (err) throw err;
+      io.emit("chatMessage_" + sender_id, newMessage);
+      io.emit("chatMessage_" + receiver_id, newMessage);
+    });
   });
-  // Handle disconnection
+ 
   socket.on("disconnect", () => {
     console.log("A user disconnected");
   });
 });
-// try {
-
-//     admin.initializeApp({
-//       credential: admin.credential.cert(serviceAccount),
-//       databaseURL: "https://fitconnect-chat-default-rtdb.firebaseio.com"
-//     })
-//     console.log('Connected Firebase');
-// } catch (error) {
-//     console.log(e);
-//     process.exit();
-// }
 
 const productRouter = require("./app/routes/product.route");
 const authRouter = require("./app/routes/auth.routes");
@@ -89,6 +81,8 @@ const messageRouter = require("./app/routes/message.route");
 const courseRouter = require("./app/routes/course.route");
 const appointmentRouter = require("./app/routes/appointment.route");
 const ratingRouter = require("./app/routes/rating.route");
+const wishlistRouter = require("./app/routes/wishlist.route");
+const galleryRouter = require("./app/routes/gallery.route");
 
 const fileUpload = require("express-fileupload");
 
@@ -101,6 +95,7 @@ var corsOptions = {
 app.use(cors(corsOptions));
 const dotenv = require("dotenv");
 const { urlencoded } = require("body-parser");
+const Message = require("./app/models/message.model");
 
 dotenv.config();
 
@@ -148,6 +143,8 @@ app.use("/api/message", messageRouter);
 app.use("/api/course", courseRouter);
 app.use("/api/appointment", appointmentRouter);
 app.use("/api/rating", ratingRouter);
+app.use("/api/wishlist", wishlistRouter);
+app.use("/api/gallery", galleryRouter);
 
 app.use((req, res, next) => {
   return next(new ApiError(404, "Resource not found"));

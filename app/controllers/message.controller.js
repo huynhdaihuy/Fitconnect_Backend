@@ -51,19 +51,33 @@ exports.getListLatestMessageBySender = async function (req, res) {
         },
       },
       {
-        $project: {
-          _id: "$_id",
-          latestMessage: 1,
+        $replaceRoot: { newRoot: "$latestMessage" }, // Replace the root with latestMessage
+      },
+      {
+        $lookup: {
+          from: "coaches",
+          localField: "receiver_id",
+          foreignField: "_id",
+          as: "receiver_id",
         },
       },
+      { $unwind: "$receiver_id" },
+      // {
+      //   $project: {
+      //     _id: "$_id",
+      //     latestMessage: 1,
+      //   },
+      // },
     ]);
 
-    const formattedResult = latestMessages.map(({ _id, latestMessage }) => ({
-      receiver_id: _id,
-      latest_message: latestMessage,
-    }));
-
-    res.json(formattedResult);
+    // const formattedResult = latestMessages.map(({ _id, latestMessage }) => ({
+    //   receiver_id: _id,
+    //   latest_message: latestMessage,
+    // }));
+    latestMessages.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
+    res.json(latestMessages);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -73,10 +87,7 @@ exports.getAllMessagesBetweenUsers = async function (req, res) {
   const senderId = req.params.sender_id;
   const receiverId = req.params.receiver_id;
 
-  if (
-    !ObjectId.isValid(senderId) ||
-    !ObjectId.isValid(receiverId)
-  ) {
+  if (!ObjectId.isValid(senderId) || !ObjectId.isValid(receiverId)) {
     return res.status(400).json({ error: "Invalid sender_id or receiver_id" });
   }
 
@@ -92,7 +103,7 @@ exports.getAllMessagesBetweenUsers = async function (req, res) {
           receiver_id: ObjectId(senderId),
         },
       ],
-    }).sort({ createdAt: 1 }); 
+    }).sort({ createdAt: 1 });
 
     res.json(messages);
   } catch (error) {
