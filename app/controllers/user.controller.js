@@ -1,9 +1,8 @@
-const Customer = require("../models/customer.model");
-const Exercise = require("../models/customer.model");
+const User = require("../models/user.model");
 
 const { cloudinaryUploadImg } = require("../utils/cloudinary");
 
-exports.createCustomer = async (req, res) => {
+exports.createUser = async (req, res) => {
   const {
     username,
     email,
@@ -13,6 +12,7 @@ exports.createCustomer = async (req, res) => {
     phone_number,
     password,
     address,
+    role,
   } = req.body;
 
   var url_avatar;
@@ -35,7 +35,7 @@ exports.createCustomer = async (req, res) => {
       }
 
       url_avatar = newpathImage.url;
-      const newCustomer = await Customer.create({
+      const newUser = await User.create({
         username,
         email,
         name,
@@ -45,60 +45,55 @@ exports.createCustomer = async (req, res) => {
         password,
         address,
         url_avatar,
+        role,
       });
-      res.status(201).json(newCustomer);
+      res.status(201).json(newUser);
     }
   } catch (error) {
     res.status(400).json(error);
   }
 };
 
-// Get all exercises
-exports.getAllCustomer = async (req, res) => {
+exports.getAllUser = async (req, res) => {
   try {
-    const customers = await Customer.find();
-    res.status(200).json(customers);
+    const Users = await User.find();
+    res.status(200).json(Users);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch exercises" });
   }
 };
 
-// Get a single exercise by ID
-exports.getCustomerById = async (req, res) => {
-  const CustomerId = req.params.id;
+exports.getUserById = async (req, res) => {
+  const UserId = req.params.id;
   try {
-    const customer = await Customer.findById(CustomerId);
-    if (!customer) {
-      return res.status(404).json({ error: "Customer not found" });
+    const User = await User.findById(UserId);
+    if (!User) {
+      return res.status(404).json({ error: "User not found" });
     }
-    res.status(200).json(Customer);
+    res.status(200).json(User);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch exercise" });
   }
 };
 
-exports.updateCustomerById = async (req, res) => {
-  const customerId = req.params.id;
+exports.updateUserById = async (req, res) => {
+  const UserId = req.params.id;
 
   try {
-    const updatedCustomer = await Customer.findByIdAndUpdate(
-      customerId,
-      req.body,
-      {
-        new: true,
-      }
-    );
-    if (!updatedCustomer) {
+    const updatedUser = await User.findByIdAndUpdate(UserId, req.body, {
+      new: true,
+    });
+    if (!updatedUser) {
       return res.status(404).json({ error: "Exercise not found" });
     }
-    res.status(200).json(updatedCustomer);
+    res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ error: "Failed to update exercise" });
   }
 };
 
 exports.uploadAvatar = async (req, res) => {
-  const customerId = req.params.id;
+  const UserId = req.params.id;
   var url_avatar;
   try {
     let uploaderImage = (path) => cloudinaryUploadImg(path, "images");
@@ -119,7 +114,7 @@ exports.uploadAvatar = async (req, res) => {
       }
       url_avatar = newpathImage.url;
     }
-    const updateCustomer = await Customer.findByIdAndUpdate(customerId, {
+    const updateUser = await User.findByIdAndUpdate(UserId, {
       url_avatar,
     });
     res.status(200).send(url_avatar);
@@ -128,55 +123,48 @@ exports.uploadAvatar = async (req, res) => {
   }
 };
 
-exports.deleteExerciseById = async (req, res) => {
-  const exerciseId = req.params.id;
-
-  try {
-    const deletedExercise = await Exercise.findByIdAndDelete(exerciseId);
-    if (!deletedExercise) {
-      return res.status(404).json({ error: "Exercise not found" });
-    }
-    res.status(204).json();
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete exercise" });
-  }
-};
-
-
-exports.forgotPassword = async(req, res) => {
+exports.forgotPassword = async (req, res) => {
   const { email, username } = req.body;
   const user = await User.findOne({ email, username });
   if (!user) {
-      return res.status(400).json({ error: 'User with that email and username does not exist' });
+    return res
+      .status(400)
+      .json({ error: "User with that email and username does not exist" });
   }
   const newPassword = Math.random().toString(36).slice(-8);
   const password = bcrypt.hashSync(newPassword, 8);
-  const userUpdated = await User.findOneAndUpdate({ email, username }, { password }, { new: true });
+  const userUpdated = await User.findOneAndUpdate(
+    { email, username },
+    { password },
+    { new: true }
+  );
   if (!userUpdated)
-      return res.status(500).json({ error: 'User can not update!' });
+    return res.status(500).json({ error: "User can not update!" });
 
   let configMail = {
-      service: 'gmail.com',
-      auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS
-      },
-
-  }
+    service: "gmail.com",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  };
   const transport = nodemailer.createTransport(configMail);
 
   const mailOptions = {
-      from: 'Blackism <huynhdaihuybank6@gmail.com>',
-      to: email,
-      subject: 'Reset Password',
-      text: `Your new password is: ${newPassword}`
+    from: "Blackism <huynhdaihuybank6@gmail.com>",
+    to: email,
+    subject: "Reset Password",
+    text: `Your new password is: ${newPassword}`,
   };
 
   transport.sendMail(mailOptions, (err, info) => {
-      if (err) {
-          return res.status(500).json({ error: 'Failed to send email' });
-      }
+    if (err) {
+      return res.status(500).json({ error: "Failed to send email" });
+    }
 
-      res.status(200).json({ message: 'Password reset successful. Check your email for the new password.' });
+    res.status(200).json({
+      message:
+        "Password reset successful. Check your email for the new password.",
+    });
   });
-}
+};

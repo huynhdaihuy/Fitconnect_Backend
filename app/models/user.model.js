@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const genderEnum = ["male", "female", "other"];
+const roleEnum = ["chief", "user", "moderator"];
 
-const CustomerSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
@@ -29,14 +30,10 @@ const CustomerSchema = new mongoose.Schema(
       enum: genderEnum,
       required: true,
     },
-    birthday: {
-      type: Date,
-      required: true,
-    },
     phone_number: {
       type: String,
       required: true,
-      unique: [true, "User's phone number required"],
+      // unique: [true, "User's phone number required"],
       maxLength: 10,
       // match: [/0[35789]\d{8}$/, "Format of phone is invalid!"],
     },
@@ -45,18 +42,6 @@ const CustomerSchema = new mongoose.Schema(
       required: [true, "User's password required"],
       minLength: 8,
     },
-    address: {
-      type: String,
-      maxLength: 200,
-    },
-    height: {
-      type: Number,
-      // required: true,
-    },
-    weight: {
-      type: Number,
-      // required: true,
-    },
     url_avatar: {
       type: String,
     },
@@ -64,18 +49,23 @@ const CustomerSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    role: {
+      type: [String],
+      enum: roleEnum,
+      default: "user",
+    },
   },
   { timestamps: true }
 );
-CustomerSchema.methods.comparePassword = async function (password) {
+UserSchema.methods.comparePassword = function (password) {
   try {
-    return await bcrypt.compare(password, this.password);
+    return bcrypt.compare(password, this.password);
   } catch (error) {
     console.error(error);
     throw new Error("An error occurred while comparing passwords");
   }
 };
-CustomerSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
   }
@@ -88,8 +78,8 @@ CustomerSchema.pre("save", async function (next) {
   }
 });
 
-CustomerSchema.set("validateBeforeSave", true);
+UserSchema.set("validateBeforeSave", true);
 
-const Customer = mongoose.model("Customer", CustomerSchema);
+const User = mongoose.model("User", UserSchema);
 
-module.exports = Customer;
+module.exports = User;
